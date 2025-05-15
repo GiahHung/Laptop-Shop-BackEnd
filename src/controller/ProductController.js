@@ -73,9 +73,85 @@ let deleteProduct = async (req, res) => {
   return res.status(200).json(message);
 };
 
+let getTopProduct = async (req, res) => {
+  let limit = req.query.limit;
+  let categoryId = req.query.categoryId
+  if (!limit) limit = 10;
+  try {
+    let response = await ProductService.getTopProduct(+limit,categoryId);
+    return res.status(200).json(response);
+  } catch (e) {
+    console.log(e);
+    return res.status(200).json({
+      errCode: -1,
+      errMessage: "Error from server",
+    });
+  }
+};
+
+let getRevenue = async(req,res) =>{
+
+  try {
+    let time = req.query.time;
+    let response = await ProductService.getRevenue(time);
+    return res.status(200).json(response);
+  } catch (e) {
+    console.log(e);
+    return res.status(200).json({
+      errCode: -1,
+      errMessage: "Error from server",
+    });
+  }
+}
+
+let getAmountOrder = async(req,res) =>{
+  try {
+    let response = await ProductService.getAmountOrder();
+    return res.status(200).json(response);
+  } catch (e) {
+    console.log(e);
+    return res.status(200).json({
+      errCode: -1,
+      errMessage: "Error from server",
+    });
+  }
+}
+
+let getAmountOrderNotConfirm = async(req,res) =>{
+  try {
+    let response = await ProductService.getAmountOrderNotConfirm();
+    return res.status(200).json(response);
+  } catch (e) {
+    console.log(e);
+    return res.status(200).json({
+      errCode: -1,
+      errMessage: "Error from server",
+    });
+  }
+ }
+
+ let getRevenueToday = async(req,res) =>{
+  try {
+    let response = await ProductService.getRevenueToday();
+    return res.status(200).json(response);
+  } catch (e) {
+    console.log(e);
+    return res.status(200).json({
+      errCode: -1,
+      errMessage: "Error from server",
+    });
+  }
+ }
+
+
 export default {
   createProduct: createProduct,
   getAllProduct: getAllProduct,
   editProduct: editProduct,
   deleteProduct: deleteProduct,
+  getTopProduct: getTopProduct,
+  getRevenue:getRevenue,
+  getAmountOrder: getAmountOrder,
+  getAmountOrderNotConfirm: getAmountOrderNotConfirm,
+  getRevenueToday: getRevenueToday,
 };

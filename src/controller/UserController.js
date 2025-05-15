@@ -1,5 +1,6 @@
 import UserService from "../service/UserService";
 
+
 let register = async (req, res) => {
   try {
     let message = await UserService.registerService(req.body);
@@ -115,6 +116,34 @@ let createUser = async (req, res) => {
   }
 };
 
+let getUserOrder = async (req, res) => {
+  try {
+    let data = await UserService.getUserOrderService(req.query.userId);
+    return res.status(200).json(data);
+  } catch (e) {
+    console.log(e);
+    return res.status(200).json({
+      errCode: 1,
+      errMessage: "Error from sever!!!",
+    });
+  }
+};
+
+let getAllProductByCategory = async (req, res) => {
+  try {
+    let data = await UserService.getAllProductByCategoryService(
+      req.query.categoryId
+    );
+    return res.status(200).json(data);
+  } catch (e) {
+    console.log(e);
+    return res.status(200).json({
+      errCode: 1,
+      errMessage: "Error from sever!!!",
+    });
+  }
+};
+
 module.exports = {
   register: register,
   login: login,
@@ -123,4 +152,6 @@ module.exports = {
   deleteUser: deleteUser,
   getAllCode: getAllCode,
   createUser: createUser,
+  getUserOrder: getUserOrder,
+  getAllProductByCategory: getAllProductByCategory,
 };

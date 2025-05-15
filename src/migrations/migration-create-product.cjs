@@ -33,6 +33,9 @@ module.exports = {
       discount: {
         type: Sequelize.INTEGER,
       },
+      mouseCategory:{
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -93,6 +93,7 @@ let loginService = (email, password) => {
         if (isExist) {
           let user = await db.User.findOne({
             attributes: [
+              "id",
               "email",
               "password",
               "firstName",
@@ -107,7 +108,7 @@ let loginService = (email, password) => {
             let isCorrect = user && check;
             const token =
               isCorrect &&
-              jwt.sign({ email: user.email }, process.env.SECRET_JWT, {
+              jwt.sign({ email: user.email,roleId:user.roleId }, process.env.SECRET_JWT, {
                 expiresIn: "2d",
               });
             if (check) {
@@ -141,7 +142,10 @@ let getAllPageUsersService = (page, limit) => {
     try {
       let offset = (page - 1) * limit;
       let { count, rows } = await db.User.findAndCountAll({
-        order: [['id', 'DESC']], 
+        order: [["id", "DESC"]],
+        attributes: {
+          exclude: ["password"],
+        },
         offset: offset,
         limit: limit,
       });
@@ -296,6 +300,85 @@ let deleteUser = (userId) => {
   });
 };
 
+let getUserOrderService = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!userId) {
+        resolve({
+          errCode: 2,
+          message: "Missing parameter",
+        });
+        return;
+      } else {
+        let order = await db.Order.findAll({
+          where: { userId: userId },
+          include: [
+            {
+              model: db.AllCode,
+              as: "paymentData",
+              attributes: ["value"],
+            },
+            {
+              model: db.AllCode,
+              as: "statusDt",
+              attributes: ["value"],
+            },
+            {
+              model: db.Transaction,
+              include: [
+                {
+                  model: db.Product,
+                  attributes: ["title", "image"],
+                },
+              ],
+            },
+          ],
+        });
+
+        resolve({
+          errCode: 0,
+          errMessage: "success",
+          order: order,
+        });
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+let getAllProductByCategoryService = (categoryId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!categoryId) {
+        resolve({
+          errCode: 2,
+          message: "Missing parameter",
+        });
+        return;
+      } else {
+        let product = await db.Product.findAll({
+          where: { categoryId: categoryId },
+          include: [
+            {
+              model: db.AllCode,
+              as: "statusData",
+              attributes: ["value"],
+            },
+          ],
+        });
+        resolve({
+          errCode: 0,
+          errMessage: "success",
+          data: product,
+        });
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 module.exports = {
   registerService: registerService,
   loginService: loginService,
@@ -305,4 +388,6 @@ module.exports = {
   createUserService: createUserService,
   deleteUser: deleteUser,
   getAllPageUsersService: getAllPageUsersService,
+  getUserOrderService: getUserOrderService,
+  getAllProductByCategoryService: getAllProductByCategoryService,
 };
